@@ -34,7 +34,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESCCM
 from .protocol import GatewayProtocol, parse_frame_33
 
 _HARDCODED_SUFFIX = b"9a4ba190ac2b5139b32c3528"  # 24 ASCII bytes
-_MAC_SIZE = 8   # bytes (64-bit MAC tag)
+_MAC_SIZE = 8  # bytes (64-bit MAC tag)
 _NONCE_SIZE = 8  # bytes
 
 
@@ -134,9 +134,7 @@ class AesCcmProtocol(GatewayProtocol):
         frame = parse_frame_33(raw)
         if frame is not None:
             if frame.is_reject:
-                raise ValueError(
-                    "Gateway returned a reject frame (0xAE)"
-                )
+                raise ValueError("Gateway returned a reject frame (0xAE)")
             raise ValueError(
                 f"Gateway returned a new-protocol frame (0xAF, "
                 f"counter={frame.counter}, tag={frame.tag.hex()})"
@@ -152,13 +150,9 @@ class AesCcmProtocol(GatewayProtocol):
         try:
             result = json.loads(text)
         except json.JSONDecodeError as exc:
-            raise ValueError(
-                f"Decrypted response is not valid JSON: {exc}"
-            ) from exc
+            raise ValueError(f"Decrypted response is not valid JSON: {exc}") from exc
 
         if result.get("status") != "success":
-            raise ValueError(
-                f"Unexpected response status: {result.get('status')!r}"
-            )
+            raise ValueError(f"Unexpected response status: {result.get('status')!r}")
 
         return result

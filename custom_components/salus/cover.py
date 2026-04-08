@@ -35,14 +35,10 @@ async def async_setup_entry(
         new_ids = set(devices) - tracked
         if new_ids:
             tracked.update(new_ids)
-            async_add_entities(
-                SalusCover(coordinator, idx, gateway) for idx in new_ids
-            )
+            async_add_entities(SalusCover(coordinator, idx, gateway) for idx in new_ids)
 
     _async_add_new()
-    config_entry.async_on_unload(
-        coordinator.async_add_listener(_async_add_new)
-    )
+    config_entry.async_on_unload(coordinator.async_add_listener(_async_add_new))
 
 
 class SalusCover(SalusEntity, CoverEntity):
@@ -94,4 +90,3 @@ class SalusCover(SalusEntity, CoverEntity):
             return
         await self._gateway.set_cover_position(self._idx, position)
         await self.coordinator.async_request_refresh()
-

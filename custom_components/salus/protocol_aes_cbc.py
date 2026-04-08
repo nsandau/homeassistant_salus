@@ -28,8 +28,24 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from .protocol import GatewayProtocol, parse_frame_33
 
 _IV = bytes(
-    [0x88, 0xA6, 0xB0, 0x79, 0x5D, 0x85, 0xDB, 0xFC,
-     0xE6, 0xE0, 0xB3, 0xE9, 0xA6, 0x29, 0x65, 0x4B]
+    [
+        0x88,
+        0xA6,
+        0xB0,
+        0x79,
+        0x5D,
+        0x85,
+        0xDB,
+        0xFC,
+        0xE6,
+        0xE0,
+        0xB3,
+        0xE9,
+        0xA6,
+        0x29,
+        0x65,
+        0x4B,
+    ]
 )
 
 
@@ -126,13 +142,9 @@ class AesCbcProtocol(GatewayProtocol):
         try:
             result = json.loads(text)
         except json.JSONDecodeError as exc:
-            raise ValueError(
-                f"Decrypted response is not valid JSON: {exc}"
-            ) from exc
+            raise ValueError(f"Decrypted response is not valid JSON: {exc}") from exc
 
         if result.get("status") != "success":
             raise ValueError(f"status={result.get('status')}")
 
         return result
-
-

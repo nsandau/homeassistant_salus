@@ -30,20 +30,16 @@ async def async_setup_entry(
     def _async_add_new() -> None:
         devices = gateway.get_climate_devices()
         new_ids = {
-            k for k, v in devices.items()
-            if v.locked is not None and k not in tracked
+            k for k, v in devices.items() if v.locked is not None and k not in tracked
         }
         if new_ids:
             tracked.update(new_ids)
             async_add_entities(
-                SalusThermostatLock(coordinator, idx, gateway)
-                for idx in new_ids
+                SalusThermostatLock(coordinator, idx, gateway) for idx in new_ids
             )
 
     _async_add_new()
-    config_entry.async_on_unload(
-        coordinator.async_add_listener(_async_add_new)
-    )
+    config_entry.async_on_unload(coordinator.async_add_listener(_async_add_new))
 
 
 class SalusThermostatLock(SalusEntity, LockEntity):

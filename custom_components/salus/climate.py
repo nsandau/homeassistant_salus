@@ -49,9 +49,7 @@ async def async_setup_entry(
             )
 
     _async_add_new()
-    config_entry.async_on_unload(
-        coordinator.async_add_listener(_async_add_new)
-    )
+    config_entry.async_on_unload(coordinator.async_add_listener(_async_add_new))
 
 
 class SalusThermostat(SalusEntity, ClimateEntity):
@@ -138,9 +136,7 @@ class SalusThermostat(SalusEntity, ClimateEntity):
         temperature = kwargs.get(ATTR_TEMPERATURE)
         if temperature is None:
             return
-        await self._gateway.set_climate_device_temperature(
-            self._idx, temperature
-        )
+        await self._gateway.set_climate_device_temperature(self._idx, temperature)
         await self.coordinator.async_request_refresh()
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
@@ -154,4 +150,3 @@ class SalusThermostat(SalusEntity, ClimateEntity):
     async def async_set_fan_mode(self, fan_mode: str) -> None:
         await self._gateway.set_climate_device_fan_mode(self._idx, fan_mode)
         await self.coordinator.async_request_refresh()
-

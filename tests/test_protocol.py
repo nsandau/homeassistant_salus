@@ -40,13 +40,13 @@ class TestIsRejectFrame:
     """Test the module-level is_reject_frame() helper."""
 
     def test_valid_reject_frame(self):
-        assert is_reject_frame(bytes(32) + b"\xAE") is True
+        assert is_reject_frame(bytes(32) + b"\xae") is True
 
     def test_wrong_length(self):
         assert is_reject_frame(bytes(32)) is False
 
     def test_wrong_trailer(self):
-        assert is_reject_frame(bytes(32) + b"\xFF") is False
+        assert is_reject_frame(bytes(32) + b"\xff") is False
 
     def test_empty(self):
         assert is_reject_frame(b"") is False
@@ -54,23 +54,19 @@ class TestIsRejectFrame:
     def test_real_world_aes256_reject(self):
         """Actual response from the user's gateway."""
         raw = bytes.fromhex(
-            "8b4108b7dcf1ed6bc03180fa566eb857"
-            "40db686c8dc55a95b8bd72be640888fd"
-            "ae"
+            "8b4108b7dcf1ed6bc03180fa566eb85740db686c8dc55a95b8bd72be640888fdae"
         )
         assert is_reject_frame(raw) is True
 
     def test_real_world_aes128_reject(self):
         raw = bytes.fromhex(
-            "beedc470081939c6560c4d7e0034207b"
-            "762d64da6055d5a3190fbe96650888fd"
-            "ae"
+            "beedc470081939c6560c4d7e0034207b762d64da6055d5a3190fbe96650888fdae"
         )
         assert is_reject_frame(raw) is True
 
     def test_new_protocol_frame_not_reject(self):
         """0xAF trailer is a new-protocol frame, not a reject."""
-        raw = bytes(32) + b"\xAF"
+        raw = bytes(32) + b"\xaf"
         assert is_reject_frame(raw) is False
 
 
@@ -78,10 +74,10 @@ class TestIsNewProtocolFrame:
     """Test is_new_protocol_frame() helper."""
 
     def test_valid_new_protocol_frame(self):
-        assert is_new_protocol_frame(bytes(32) + b"\xAF") is True
+        assert is_new_protocol_frame(bytes(32) + b"\xaf") is True
 
     def test_reject_is_not_new_protocol(self):
-        assert is_new_protocol_frame(bytes(32) + b"\xAE") is False
+        assert is_new_protocol_frame(bytes(32) + b"\xae") is False
 
     def test_wrong_length(self):
         assert is_new_protocol_frame(bytes(32)) is False
@@ -92,9 +88,7 @@ class TestIsNewProtocolFrame:
     def test_real_world_new_protocol(self):
         """Actual 0xAF response from user's gateway."""
         raw = bytes.fromhex(
-            "ac1488c2aeab8e40a4487bcf38a03586"
-            "3e4d863c551fda99a0e187357b084b1f"
-            "af"
+            "ac1488c2aeab8e40a4487bcf38a035863e4d863c551fda99a0e187357b084b1faf"
         )
         assert is_new_protocol_frame(raw) is True
 
@@ -104,9 +98,7 @@ class TestParseFrame33:
 
     def test_reject_frame(self):
         raw = bytes.fromhex(
-            "8b4108b7dcf1ed6bc03180fa566eb857"
-            "40db686c8dc55a95b8bd72be640888fd"
-            "ae"
+            "8b4108b7dcf1ed6bc03180fa566eb85740db686c8dc55a95b8bd72be640888fdae"
         )
         frame = parse_frame_33(raw)
         assert frame is not None
@@ -119,9 +111,7 @@ class TestParseFrame33:
 
     def test_new_protocol_frame(self):
         raw = bytes.fromhex(
-            "ac1488c2aeab8e40a4487bcf38a03586"
-            "3e4d863c551fda99a0e187357b084b1f"
-            "af"
+            "ac1488c2aeab8e40a4487bcf38a035863e4d863c551fda99a0e187357b084b1faf"
         )
         frame = parse_frame_33(raw)
         assert frame is not None
@@ -147,7 +137,7 @@ class TestParseFrame33:
         assert counters == [0x7B, 0x7C, 0x7D]
 
     def test_wrong_trailer_returns_none(self):
-        raw = bytes(32) + b"\xFF"
+        raw = bytes(32) + b"\xff"
         assert parse_frame_33(raw) is None
 
     def test_wrong_length_returns_none(self):
@@ -157,7 +147,7 @@ class TestParseFrame33:
         assert parse_frame_33(b"") is None
 
     def test_frame33_is_frozen(self):
-        raw = bytes(32) + b"\xAE"
+        raw = bytes(32) + b"\xae"
         frame = parse_frame_33(raw)
         with pytest.raises(AttributeError):
             frame.counter = 99  # type: ignore[misc]

@@ -92,7 +92,7 @@ class TestNonce:
         n1 = _build_nonce(0x00)
         n2 = _build_nonce(0xFF)
         assert n1[3:5] == b"\x00\x00"
-        assert n2[3:5] == b"\x00\xFF"
+        assert n2[3:5] == b"\x00\xff"
 
     def test_counter_wraps_at_16bit(self):
         n = _build_nonce(0x10000)
@@ -288,7 +288,7 @@ class TestAesCcmConnect:
     async def test_connect_reject_frame_raises(self):
         """33-byte 0xAE response should raise with reject-frame message."""
         proto = AesCcmProtocol(self.EUID)
-        reject = bytes(32) + b"\xAE"
+        reject = bytes(32) + b"\xae"
 
         mock_resp = _mock_response(200, reject)
 
@@ -301,7 +301,7 @@ class TestAesCcmConnect:
     async def test_connect_new_protocol_frame_raises(self):
         """33-byte 0xAF response should raise with new-protocol-frame message."""
         proto = AesCcmProtocol(self.EUID)
-        new_proto_resp = bytes(32) + b"\xAF"
+        new_proto_resp = bytes(32) + b"\xaf"
 
         mock_resp = _mock_response(200, new_proto_resp)
 

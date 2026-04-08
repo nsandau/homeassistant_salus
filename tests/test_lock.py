@@ -15,11 +15,13 @@ from custom_components.salus.models import ClimateDevice
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def lockable_climate_device(climate_device: ClimateDevice) -> ClimateDevice:
     """Return a climate device that supports the child lock (locked != None)."""
     # climate_device fixture has locked=None; override with a locked variant
     from dataclasses import replace
+
     return replace(climate_device, locked=False)
 
 
@@ -39,6 +41,7 @@ def _make_entity(
 # Property tests
 # ---------------------------------------------------------------------------
 
+
 class TestSalusThermostatLockProperties:
     """Test lock entity property delegation."""
 
@@ -56,6 +59,7 @@ class TestSalusThermostatLockProperties:
 
     def test_is_locked_when_locked(self, lockable_climate_device):
         from dataclasses import replace
+
         locked_dev = replace(lockable_climate_device, locked=True)
         entity, _ = _make_entity(locked_dev)
         # Override the gateway mock return to return locked device
@@ -78,6 +82,7 @@ class TestSalusThermostatLockProperties:
 # Command tests
 # ---------------------------------------------------------------------------
 
+
 class TestSalusThermostatLockCommands:
     """Test lock/unlock forwarding to the gateway."""
 
@@ -85,7 +90,8 @@ class TestSalusThermostatLockCommands:
         entity, gw = _make_entity(lockable_climate_device)
         await entity.async_lock()
         gw.set_climate_device_locked.assert_awaited_once_with(
-            lockable_climate_device.unique_id, True,
+            lockable_climate_device.unique_id,
+            True,
         )
         entity.coordinator.async_request_refresh.assert_awaited_once()
 
@@ -93,6 +99,7 @@ class TestSalusThermostatLockCommands:
         entity, gw = _make_entity(lockable_climate_device)
         await entity.async_unlock()
         gw.set_climate_device_locked.assert_awaited_once_with(
-            lockable_climate_device.unique_id, False,
+            lockable_climate_device.unique_id,
+            False,
         )
         entity.coordinator.async_request_refresh.assert_awaited_once()

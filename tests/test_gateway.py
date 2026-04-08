@@ -91,14 +91,14 @@ class TestVoltageToBatteryPct:
         ("voltage", "model", "expected"),
         [
             # Window-curve models (thresholds 2.6 / 2.3 / 2.1)
-            (3.0, "SW600", 100),   # well above 2.6 V
-            (2.6, "SW600", 100),   # exactly high
-            (2.5, "SW600", 50),    # between high and medium
-            (2.3, "SW600", 50),    # exactly medium
-            (2.2, "SW600", 25),    # between medium and low
-            (2.1, "SW600", 25),    # exactly low
-            (2.0, "SW600", 0),     # below low
-            (0.0, "SW600", 0),     # zero voltage
+            (3.0, "SW600", 100),  # well above 2.6 V
+            (2.6, "SW600", 100),  # exactly high
+            (2.5, "SW600", 50),  # between high and medium
+            (2.3, "SW600", 50),  # exactly medium
+            (2.2, "SW600", 25),  # between medium and low
+            (2.1, "SW600", 25),  # exactly low
+            (2.0, "SW600", 0),  # below low
+            (0.0, "SW600", 0),  # zero voltage
             # Door-curve models (thresholds 2.9 / 2.8 / 2.2)
             (3.0, "SmokeSensor-EM", 100),
             (2.9, "SmokeSensor-EM", 100),
@@ -421,8 +421,10 @@ class TestRefreshClimateDevices:
             ],
         }
         with patch.object(
-            gw, "_make_encrypted_request",
-            new_callable=AsyncMock, return_value=resp,
+            gw,
+            "_make_encrypted_request",
+            new_callable=AsyncMock,
+            return_value=resp,
         ):
             await gw._refresh_climate_devices(devices)
 
@@ -460,8 +462,10 @@ class TestRefreshClimateDevices:
             ],
         }
         with patch.object(
-            gw, "_make_encrypted_request",
-            new_callable=AsyncMock, return_value=resp,
+            gw,
+            "_make_encrypted_request",
+            new_callable=AsyncMock,
+            return_value=resp,
         ):
             await gw._refresh_climate_devices(devices)
 
@@ -509,8 +513,10 @@ class TestRefreshClimateDevices:
             ],
         }
         with patch.object(
-            gw, "_make_encrypted_request",
-            new_callable=AsyncMock, return_value=resp,
+            gw,
+            "_make_encrypted_request",
+            new_callable=AsyncMock,
+            return_value=resp,
         ):
             await gw._refresh_climate_devices(devices)
 
@@ -525,8 +531,10 @@ class TestRefreshClimateDevices:
         devices = [{"data": {"UniID": "sq_noh"}, "sIT600TH": {}}]
         resp = self._it600th_response(hold=0, running=0)
         with patch.object(
-            gw, "_make_encrypted_request",
-            new_callable=AsyncMock, return_value=resp,
+            gw,
+            "_make_encrypted_request",
+            new_callable=AsyncMock,
+            return_value=resp,
         ):
             await gw._refresh_climate_devices(devices)
 
@@ -1770,14 +1778,10 @@ class TestCommands:
         with patch.object(
             gw, "_make_encrypted_request", new_callable=AsyncMock
         ) as mock_req:
-            await gw.set_climate_device_temperature(
-                climate_device.unique_id, 23.5
-            )
+            await gw.set_climate_device_temperature(climate_device.unique_id, 23.5)
 
         call_body = mock_req.call_args[0][1]
-        assert (
-            call_body["id"][0]["sIT600TH"]["SetHeatingSetpoint_x100"] == 2350
-        )
+        assert call_body["id"][0]["sIT600TH"]["SetHeatingSetpoint_x100"] == 2350
 
     async def test_set_climate_preset_off(self, climate_device):
         gw = _make_gateway()
@@ -1786,9 +1790,7 @@ class TestCommands:
         with patch.object(
             gw, "_make_encrypted_request", new_callable=AsyncMock
         ) as mock_req:
-            await gw.set_climate_device_preset(
-                climate_device.unique_id, PRESET_OFF
-            )
+            await gw.set_climate_device_preset(climate_device.unique_id, PRESET_OFF)
 
         call_body = mock_req.call_args[0][1]
         assert call_body["id"][0]["sIT600TH"]["SetHoldType"] == 7
@@ -1814,9 +1816,7 @@ class TestCommands:
         with patch.object(
             gw, "_make_encrypted_request", new_callable=AsyncMock
         ) as mock_req:
-            await gw.set_climate_device_mode(
-                climate_device.unique_id, HVAC_MODE_OFF
-            )
+            await gw.set_climate_device_mode(climate_device.unique_id, HVAC_MODE_OFF)
 
         call_body = mock_req.call_args[0][1]
         assert call_body["id"][0]["sIT600TH"]["SetHoldType"] == 7
@@ -1851,9 +1851,7 @@ class TestCommands:
             ],
             locked=False,
             supported_features=(
-                SUPPORT_TARGET_TEMPERATURE
-                | SUPPORT_PRESET_MODE
-                | SUPPORT_FAN_MODE
+                SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE | SUPPORT_FAN_MODE
             ),
             device_class="temperature",
             data={"UniID": "fc_001", "Endpoint": 1},
@@ -2036,9 +2034,7 @@ class TestProtocolAutoDetect:
 
         not_impl_proto = MagicMock()
         not_impl_proto.name = "Skeleton"
-        not_impl_proto.connect = AsyncMock(
-            side_effect=NotImplementedError("not yet")
-        )
+        not_impl_proto.connect = AsyncMock(side_effect=NotImplementedError("not yet"))
 
         ok_proto = MagicMock()
         ok_proto.name = "OK"
@@ -2094,9 +2090,7 @@ class TestProtocolAutoDetect:
         failing.connect = AsyncMock(side_effect=Exception("fail"))
 
         gw._session = MagicMock()
-        gw._session.get = AsyncMock(
-            side_effect=OSError("Connection refused")
-        )
+        gw._session.get = AsyncMock(side_effect=OSError("Connection refused"))
 
         with patch(
             "custom_components.salus.gateway.AesCbcProtocol",
@@ -2112,16 +2106,12 @@ class TestProtocolAutoDetect:
         reject_proto = MagicMock()
         reject_proto.name = "Fail"
         reject_proto.connect = AsyncMock(
-            side_effect=ValueError(
-                "Gateway returned a reject frame (0xAE)"
-            )
+            side_effect=ValueError("Gateway returned a reject frame (0xAE)")
         )
 
         not_impl = MagicMock()
         not_impl.name = "ECDH"
-        not_impl.connect = AsyncMock(
-            side_effect=NotImplementedError("not yet")
-        )
+        not_impl.connect = AsyncMock(side_effect=NotImplementedError("not yet"))
 
         mock_resp = AsyncMock()
         mock_resp.status = 200
@@ -2147,16 +2137,13 @@ class TestProtocolAutoDetect:
         new_proto.name = "AES-256"
         new_proto.connect = AsyncMock(
             side_effect=ValueError(
-                "Gateway returned a new-protocol frame (0xAF, "
-                "counter=123, tag=084b1f)"
+                "Gateway returned a new-protocol frame (0xAF, counter=123, tag=084b1f)"
             )
         )
 
         not_impl = MagicMock()
         not_impl.name = "ECDH"
-        not_impl.connect = AsyncMock(
-            side_effect=NotImplementedError("not yet")
-        )
+        not_impl.connect = AsyncMock(side_effect=NotImplementedError("not yet"))
 
         mock_resp = AsyncMock()
         mock_resp.status = 200
@@ -2204,7 +2191,3 @@ class TestExtractGatewayMac:
     def test_missing_id_key_returns_none(self):
         gw = _make_gateway()
         assert gw._extract_gateway_mac({}) is None
-
-
-
-

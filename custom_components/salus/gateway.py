@@ -128,7 +128,9 @@ class IT600Gateway:
         euid_masked = self._euid[:4] + "…" + self._euid[-4:]
         _LOGGER.debug(
             "Connecting to gateway at %s:%s (EUID %s)",
-            self._host, self._port, euid_masked,
+            self._host,
+            self._port,
+            euid_masked,
         )
 
         if self._session is None:
@@ -160,12 +162,16 @@ class IT600Gateway:
                 break
             except NotImplementedError as exc:
                 _LOGGER.debug(
-                    "Protocol %s: not implemented — %s", proto.name, exc,
+                    "Protocol %s: not implemented — %s",
+                    proto.name,
+                    exc,
                 )
             except Exception as exc:
                 msg = str(exc)
                 _LOGGER.debug(
-                    "Protocol %s: failed — %s", proto.name, msg,
+                    "Protocol %s: failed — %s",
+                    proto.name,
+                    msg,
                 )
                 if "reject frame" in msg.lower():
                     saw_reject = True
@@ -177,7 +183,9 @@ class IT600Gateway:
             mac = self._extract_gateway_mac(result)
             if mac is not None:
                 _LOGGER.debug(
-                    "Connected via %s, MAC: %s", self._protocol.name, mac,
+                    "Connected via %s, MAC: %s",
+                    self._protocol.name,
+                    mac,
                 )
                 return mac
 
@@ -186,9 +194,7 @@ class IT600Gateway:
         # Probe root URL to confirm reachability
         try:
             async with asyncio.timeout(self._request_timeout):
-                probe = await self._session.get(
-                    f"http://{self._host}:{self._port}/"
-                )
+                probe = await self._session.get(f"http://{self._host}:{self._port}/")
                 await probe.read()
         except Exception as exc:
             raise IT600ConnectionError(
@@ -214,11 +220,7 @@ class IT600Gateway:
         """Return the gateway MAC from a readall response, or None."""
         devices = result.get("id", [])
         gateway = next(
-            (
-                x
-                for x in devices
-                if x.get("sGateway", {}).get("NetworkLANMAC", "")
-            ),
+            (x for x in devices if x.get("sGateway", {}).get("NetworkLANMAC", "")),
             None,
         )
         if gateway is None:
@@ -246,9 +248,7 @@ class IT600Gateway:
             try:
                 if label == "climate":
                     filtered = [
-                        x
-                        for x in all_devices["id"]
-                        if "sIT600TH" in x or "sTherS" in x
+                        x for x in all_devices["id"] if "sIT600TH" in x or "sTherS" in x
                     ]
                     await self._refresh_climate_devices(filtered, send_callback)
                 elif label == "binary_sensor":
@@ -262,18 +262,12 @@ class IT600Gateway:
                             in ("it600MINITRV", "it600Receiver")
                         )
                     ]
-                    await self._refresh_binary_sensor_devices(
-                        filtered, send_callback
-                    )
+                    await self._refresh_binary_sensor_devices(filtered, send_callback)
                 elif label == "gateway":
-                    filtered = [
-                        x for x in all_devices["id"] if "sGateway" in x
-                    ]
+                    filtered = [x for x in all_devices["id"] if "sGateway" in x]
                     await self._refresh_gateway_device(filtered, send_callback)
                 else:
-                    filtered = [
-                        x for x in all_devices["id"] if key in x
-                    ]
+                    filtered = [x for x in all_devices["id"] if key in x]
                     await refresher(filtered, send_callback)
             except Exception:
                 _LOGGER.exception("Failed to poll %s devices", label)
@@ -307,13 +301,9 @@ class IT600Gateway:
                     name=model or "Salus Gateway",
                     unique_id=unique_id,
                     data=ds["data"],
-                    manufacturer=ds.get("sBasicS", {}).get(
-                        "ManufactureName", "SALUS"
-                    ),
+                    manufacturer=ds.get("sBasicS", {}).get("ManufactureName", "SALUS"),
                     model=model,
-                    sw_version=ds.get("sOTA", {}).get(
-                        "OTAFirmwareVersion_d"
-                    ),
+                    sw_version=ds.get("sOTA", {}).get("OTAFirmwareVersion_d"),
                 )
             except Exception:
                 _LOGGER.exception("Failed to parse gateway %s", unique_id)
@@ -345,9 +335,7 @@ class IT600Gateway:
                 if ds.get("sButtonS", {}).get("Mode") == 0:
                     continue  # disabled endpoint
 
-                model_id = ds.get("DeviceL", {}).get(
-                    "ModelIdentifier_i"
-                )
+                model_id = ds.get("DeviceL", {}).get("ModelIdentifier_i")
 
                 current_position = ds.get("sLevelS", {}).get("CurrentLevel")
 
@@ -357,8 +345,7 @@ class IT600Gateway:
                     set_position = int(move_raw[:2], 16)
 
                 device = CoverDevice(
-                    available=ds.get("sZDOInfo", {}).get("OnlineStatus_i", 1)
-                    == 1,
+                    available=ds.get("sZDOInfo", {}).get("OnlineStatus_i", 1) == 1,
                     name=self._device_name(ds, "Unknown"),
                     unique_id=unique_id,
                     current_cover_position=current_position,
@@ -378,9 +365,7 @@ class IT600Gateway:
                     ),
                     device_class=COVER_DEVICE_CLASS_MAP.get(model_id),
                     data=ds["data"],
-                    manufacturer=ds.get("sBasicS", {}).get(
-                        "ManufactureName", "SALUS"
-                    ),
+                    manufacturer=ds.get("sBasicS", {}).get("ManufactureName", "SALUS"),
                     model=model_id,
                     sw_version=ds.get("sZDO", {}).get("FirmwareVersion"),
                 )
@@ -434,20 +419,15 @@ class IT600Gateway:
                 model = ds.get("DeviceL", {}).get("ModelIdentifier_i")
 
                 device = SwitchDevice(
-                    available=ds.get("sZDOInfo", {}).get("OnlineStatus_i", 1)
-                    == 1,
+                    available=ds.get("sZDOInfo", {}).get("OnlineStatus_i", 1) == 1,
                     name=self._device_name(ds, unique_id),
                     unique_id=unique_id,
                     is_on=is_on == 1,
                     device_class=(
-                        "outlet"
-                        if model in ("SP600", "SPE600")
-                        else "switch"
+                        "outlet" if model in ("SP600", "SPE600") else "switch"
                     ),
                     data=ds["data"],
-                    manufacturer=ds.get("sBasicS", {}).get(
-                        "ManufactureName", "SALUS"
-                    ),
+                    manufacturer=ds.get("sBasicS", {}).get("ManufactureName", "SALUS"),
                     model=model,
                     sw_version=ds.get("sZDO", {}).get("FirmwareVersion"),
                 )
@@ -531,17 +511,14 @@ class IT600Gateway:
                 model = ds.get("DeviceL", {}).get("ModelIdentifier_i")
 
                 device = SensorDevice(
-                    available=ds.get("sZDOInfo", {}).get("OnlineStatus_i", 1)
-                    == 1,
+                    available=ds.get("sZDOInfo", {}).get("OnlineStatus_i", 1) == 1,
                     name=self._device_name(ds, "Unknown"),
                     unique_id=sensor_uid,
                     state=temperature / 100,
                     unit_of_measurement=TEMP_CELSIUS,
                     device_class="temperature",
                     data=ds["data"],
-                    manufacturer=ds.get("sBasicS", {}).get(
-                        "ManufactureName", "SALUS"
-                    ),
+                    manufacturer=ds.get("sBasicS", {}).get("ManufactureName", "SALUS"),
                     model=model,
                     sw_version=ds.get("sZDO", {}).get("FirmwareVersion"),
                 )
@@ -555,9 +532,7 @@ class IT600Gateway:
                 # standalone multi-sensors such as TS600 but NOT on thermostats.
                 # For thermostats (sIT600TH) humidity is read in
                 # _refresh_climate_devices from SunnySetpoint_x100 instead.
-                humidity_raw = (
-                    ds.get("sRelativeHumidity", {}).get("MeasuredValue_x100")
-                )
+                humidity_raw = ds.get("sRelativeHumidity", {}).get("MeasuredValue_x100")
                 if humidity_raw is not None:
                     hum_uid = f"{unique_id}_humidity"
                     hum = SensorDevice(
@@ -581,9 +556,7 @@ class IT600Gateway:
                         await self._send_sensor_update_callback(hum_uid)
 
                 # BatteryVoltage_x10 → percentage battery sensor
-                voltage_raw = ds.get("sPowerS", {}).get(
-                    "BatteryVoltage_x10"
-                )
+                voltage_raw = ds.get("sPowerS", {}).get("BatteryVoltage_x10")
                 if voltage_raw is not None:
                     voltage = voltage_raw / 10
                     pct = self._voltage_to_battery_pct(voltage, model)
@@ -661,28 +634,21 @@ class IT600Gateway:
                     device_class = None
 
                 device = BinarySensorDevice(
-                    available=ds.get("sZDOInfo", {}).get("OnlineStatus_i", 1)
-                    == 1,
+                    available=ds.get("sZDOInfo", {}).get("OnlineStatus_i", 1) == 1,
                     name=self._device_name(ds, "Unknown"),
                     unique_id=unique_id,
                     is_on=is_on == 1,
                     device_class=device_class,
                     data=ds["data"],
-                    manufacturer=ds.get("sBasicS", {}).get(
-                        "ManufactureName", "SALUS"
-                    ),
+                    manufacturer=ds.get("sBasicS", {}).get("ManufactureName", "SALUS"),
                     model=model,
                     sw_version=ds.get("sZDO", {}).get("FirmwareVersion"),
                 )
                 local[device.unique_id] = device
 
                 # Low-battery binary sensors from sPowerS / sIASZS
-                low_batt_iaszs = ds.get("sIASZS", {}).get(
-                    "ErrorIASZSLowBattery"
-                )
-                low_batt_power = ds.get("sPowerS", {}).get(
-                    "ErrorPowerSLowBattery"
-                )
+                low_batt_iaszs = ds.get("sIASZS", {}).get("ErrorIASZSLowBattery")
+                low_batt_power = ds.get("sPowerS", {}).get("ErrorPowerSLowBattery")
                 if low_batt_iaszs is not None:
                     lb_uid = f"{unique_id}_low_battery"
                     local[lb_uid] = BinarySensorDevice(
@@ -716,13 +682,9 @@ class IT600Gateway:
 
                 if send_callback:
                     self._binary_sensor_devices[device.unique_id] = device
-                    await self._send_binary_sensor_update_callback(
-                        device.unique_id
-                    )
+                    await self._send_binary_sensor_update_callback(device.unique_id)
             except Exception:
-                _LOGGER.exception(
-                    "Failed to poll binary sensor %s", unique_id
-                )
+                _LOGGER.exception("Failed to poll binary sensor %s", unique_id)
 
         self._binary_sensor_devices = local
 
@@ -764,10 +726,7 @@ class IT600Gateway:
                 sfans = ds.get("sFanS")
 
                 common = {
-                    "available": ds.get("sZDOInfo", {}).get(
-                        "OnlineStatus_i", 1
-                    )
-                    == 1,
+                    "available": ds.get("sZDOInfo", {}).get("OnlineStatus_i", 1) == 1,
                     "name": self._device_name(ds, "Unknown"),
                     "unique_id": unique_id,
                     "temperature_unit": TEMP_CELSIUS,
@@ -793,9 +752,7 @@ class IT600Gateway:
                     # HeatingControl == 0 and are correctly excluded.
                     status_d = th.get("Status_d", "")
                     heating_ctrl = (
-                        int(status_d[32:34], 16)
-                        if len(status_d) >= 34
-                        else 0
+                        int(status_d[32:34], 16) if len(status_d) >= 34 else 0
                     )
                     # Fall back to model-name check if Status_d is absent or
                     # HeatingControl is 0: all SQ610 variants are treated as
@@ -812,7 +769,8 @@ class IT600Gateway:
                             humidity_local[hum_uid] = SensorDevice(
                                 available=ds.get("sZDOInfo", {}).get(
                                     "OnlineStatus_i", 1
-                                ) == 1,
+                                )
+                                == 1,
                                 name=f"{self._device_name(ds, 'Unknown')} Humidity",
                                 unique_id=hum_uid,
                                 state=humidity,
@@ -823,9 +781,7 @@ class IT600Gateway:
                                     "ManufactureName", "SALUS"
                                 ),
                                 model=model,
-                                sw_version=ds.get("sZDO", {}).get(
-                                    "FirmwareVersion"
-                                ),
+                                sw_version=ds.get("sZDO", {}).get("FirmwareVersion"),
                                 parent_unique_id=unique_id,
                                 entity_category=None,
                             )
@@ -915,8 +871,7 @@ class IT600Gateway:
                     device = ClimateDevice(
                         **common,
                         current_humidity=None,
-                        current_temperature=ther["LocalTemperature_x100"]
-                        / 100,
+                        current_temperature=ther["LocalTemperature_x100"] / 100,
                         target_temperature=target,
                         max_temp=max_t,
                         min_temp=min_t,
@@ -1152,11 +1107,10 @@ class IT600Gateway:
     def get_binary_sensor_devices(self) -> dict[str, BinarySensorDevice]:
         return {**self._binary_sensor_devices, **self._error_binary_sensor_devices}
 
-    def get_binary_sensor_device(
-        self, device_id: str
-    ) -> BinarySensorDevice | None:
-        return (self._binary_sensor_devices.get(device_id)
-                or self._error_binary_sensor_devices.get(device_id))
+    def get_binary_sensor_device(self, device_id: str) -> BinarySensorDevice | None:
+        return self._binary_sensor_devices.get(
+            device_id
+        ) or self._error_binary_sensor_devices.get(device_id)
 
     def get_switch_devices(self) -> dict[str, SwitchDevice]:
         return self._switch_devices
@@ -1179,10 +1133,12 @@ class IT600Gateway:
         }
 
     def get_sensor_device(self, device_id: str) -> SensorDevice | None:
-        return (self._sensor_devices.get(device_id)
-                or self._battery_sensor_devices.get(device_id)
-                or self._humidity_sensor_devices.get(device_id)
-                or self._energy_sensor_devices.get(device_id))
+        return (
+            self._sensor_devices.get(device_id)
+            or self._battery_sensor_devices.get(device_id)
+            or self._humidity_sensor_devices.get(device_id)
+            or self._energy_sensor_devices.get(device_id)
+        )
 
     # ------------------------------------------------------------------
     #  Commands — covers
@@ -1205,9 +1161,7 @@ class IT600Gateway:
                 "id": [
                     {
                         "data": device.data,
-                        "sLevelS": {
-                            "SetMoveToLevel": f"{position:02x}FFFF"
-                        },
+                        "sLevelS": {"SetMoveToLevel": f"{position:02x}FFFF"},
                     }
                 ],
             },
@@ -1253,9 +1207,7 @@ class IT600Gateway:
     #  Commands — climate
     # ------------------------------------------------------------------
 
-    async def set_climate_device_preset(
-        self, device_id: str, preset: str
-    ) -> None:
+    async def set_climate_device_preset(self, device_id: str, preset: str) -> None:
         device = self.get_climate_device(device_id)
         if device is None:
             _LOGGER.error("Climate device not found: %s", device_id)
@@ -1292,9 +1244,7 @@ class IT600Gateway:
             },
         )
 
-    async def set_climate_device_mode(
-        self, device_id: str, mode: str
-    ) -> None:
+    async def set_climate_device_mode(self, device_id: str, mode: str) -> None:
         device = self.get_climate_device(device_id)
         if device is None:
             _LOGGER.error("Climate device not found: %s", device_id)
@@ -1303,11 +1253,7 @@ class IT600Gateway:
         if device.model == "FC600":
             # FC600: 4 = heat, 3 = cool, 1 = auto
             sys_mode = (
-                4
-                if mode == HVAC_MODE_HEAT
-                else 3
-                if mode == HVAC_MODE_COOL
-                else 1
+                4 if mode == HVAC_MODE_HEAT else 3 if mode == HVAC_MODE_COOL else 1
             )
             payload = {"sTherS": {"SetSystemMode": sys_mode}}
         else:
@@ -1323,9 +1269,7 @@ class IT600Gateway:
             },
         )
 
-    async def set_climate_device_fan_mode(
-        self, device_id: str, mode: str
-    ) -> None:
+    async def set_climate_device_fan_mode(self, device_id: str, mode: str) -> None:
         device = self.get_climate_device(device_id)
         if device is None:
             _LOGGER.error("Climate device not found: %s", device_id)
@@ -1348,15 +1292,11 @@ class IT600Gateway:
             "write",
             {
                 "requestAttr": "write",
-                "id": [
-                    {"data": device.data, "sFanS": {"FanMode": fan_val}}
-                ],
+                "id": [{"data": device.data, "sFanS": {"FanMode": fan_val}}],
             },
         )
 
-    async def set_climate_device_locked(
-        self, device_id: str, locked: bool
-    ) -> None:
+    async def set_climate_device_locked(self, device_id: str, locked: bool) -> None:
         device = self.get_climate_device(device_id)
         if device is None:
             _LOGGER.error("Climate device not found: %s", device_id)
@@ -1422,9 +1362,7 @@ class IT600Gateway:
             return fallback
 
     @staticmethod
-    def _voltage_to_battery_pct(
-        voltage: float, model: str | None
-    ) -> int | None:
+    def _voltage_to_battery_pct(voltage: float, model: str | None) -> int | None:
         """Convert BatteryVoltage_x10 (in volts) to a percentage.
 
         Uses thresholds extracted from the official Salus web-app JS.
@@ -1480,13 +1418,13 @@ class IT600Gateway:
 
                 _LOGGER.debug(
                     "Gateway %s → HTTP %s (%d bytes)",
-                    command, resp.status, len(raw),
+                    command,
+                    resp.status,
+                    len(raw),
                 )
 
                 if resp.status != 200:
-                    raise IT600CommandError(
-                        f"Gateway returned HTTP {resp.status}"
-                    )
+                    raise IT600CommandError(f"Gateway returned HTTP {resp.status}")
 
                 try:
                     decrypted = self._protocol.unwrap_response(raw)
@@ -1512,12 +1450,13 @@ class IT600Gateway:
                 raise IT600ConnectionError(
                     "Cannot reach iT600 gateway — check host / IP address"
                 ) from exc
-            except (IT600CommandError, IT600ConnectionError,
-                    IT600AuthenticationError):
+            except (IT600CommandError, IT600ConnectionError, IT600AuthenticationError):
                 raise
             except Exception as exc:
                 _LOGGER.error(
-                    "Unexpected error: %s / %s", type(exc).__name__, exc,
+                    "Unexpected error: %s / %s",
+                    type(exc).__name__,
+                    exc,
                     exc_info=True,
                 )
                 raise IT600CommandError(

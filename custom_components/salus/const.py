@@ -76,17 +76,19 @@ BATTERY_ERROR_CODES: frozenset[str] = frozenset({"Error22", "Error32"})
 # Only these OEM models are battery-powered thermostats that report a
 # 0-5 battery level at Status_d character 99.  All other IT600 devices
 # are mains-powered and always report 0 (which is meaningless).
-BATTERY_OEM_MODELS: frozenset[str] = frozenset({"SQ610RF", "SQ610RF(WB)", "SQ610RFNH(WB)", "SQ610RFNH"})
+BATTERY_OEM_MODELS: frozenset[str] = frozenset(
+    {"SQ610RF", "SQ610RF(WB)", "SQ610RFNH(WB)", "SQ610RFNH"}
+)
 
 # Mapping from raw battery level (0-5) to percentage for Status_d character 99.
 # Based on thermostat display: 5=4 lines (100%), 4=3 lines (75%), 3=2 lines (50%),
 # 2=1 line (25%), 1=empty with "low battery" warning (10%), 0=critical (0%).
 BATTERY_LEVEL_MAP: dict[int, int] = {
-    0: 0,    # Critical (rarely seen)
-    1: 10,   # Low battery warning, empty symbol
-    2: 25,   # 1 line visible (quarter)
-    3: 50,   # 2 lines visible (half)
-    4: 75,   # 3 lines visible (three-quarters)
+    0: 0,  # Critical (rarely seen)
+    1: 10,  # Low battery warning, empty symbol
+    2: 25,  # 1 line visible (quarter)
+    3: 50,  # 2 lines visible (half)
+    4: 75,  # 3 lines visible (three-quarters)
     5: 100,  # 4 lines visible (full)
 }
 
@@ -116,17 +118,28 @@ BATTERY_VOLTAGE_THRESHOLDS: dict[str, list[tuple[float, int, str]]] = {
 }
 
 # Models that use the "door" voltage curve (CO, smoke, remote temp)
-DOOR_VOLTAGE_MODELS: frozenset[str] = frozenset({
-    "SmokeSensor-EM", "WLS600", "TS600", "SD600",
-})
+DOOR_VOLTAGE_MODELS: frozenset[str] = frozenset(
+    {
+        "SmokeSensor-EM",
+        "WLS600",
+        "TS600",
+        "SD600",
+    }
+)
 # Models that use the "window" voltage curve
-WINDOW_VOLTAGE_MODELS: frozenset[str] = frozenset({
-    "SW600", "OS600",
-})
+WINDOW_VOLTAGE_MODELS: frozenset[str] = frozenset(
+    {
+        "SW600",
+        "OS600",
+    }
+)
 # Models that use the "energy_meter" voltage curve
-ENERGY_METER_VOLTAGE_MODELS: frozenset[str] = frozenset({
-    "RE600", "RE10B",
-})
+ENERGY_METER_VOLTAGE_MODELS: frozenset[str] = frozenset(
+    {
+        "RE600",
+        "RE10B",
+    }
+)
 
 # ── Cover device class mapping ────────────────────────────────────
 COVER_DEVICE_CLASS_MAP: dict[str, str] = {

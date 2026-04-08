@@ -41,9 +41,7 @@ async def async_setup_entry(
             )
 
     _async_add_new()
-    config_entry.async_on_unload(
-        coordinator.async_add_listener(_async_add_new)
-    )
+    config_entry.async_on_unload(coordinator.async_add_listener(_async_add_new))
 
 
 class SalusSensor(SalusEntity, SensorEntity):
@@ -102,4 +100,3 @@ class SalusSensor(SalusEntity, SensorEntity):
             "model": d.model,
             "sw_version": d.sw_version,
         }
-

@@ -25,7 +25,7 @@ import aiohttp
 #   Byte   32    ( 1 B)   trailer:  0xAE → reject,  0xAF → new-protocol
 # ---------------------------------------------------------------------------
 
-REJECT_FRAME_LENGTH = 33          # kept for backward compat
+REJECT_FRAME_LENGTH = 33  # kept for backward compat
 REJECT_TRAILER = 0xAE
 NEW_PROTOCOL_TRAILER = 0xAF
 _KNOWN_TRAILERS = frozenset({REJECT_TRAILER, NEW_PROTOCOL_TRAILER})
@@ -35,10 +35,10 @@ _KNOWN_TRAILERS = frozenset({REJECT_TRAILER, NEW_PROTOCOL_TRAILER})
 class Frame33:
     """Parsed 33-byte gateway response frame."""
 
-    payload: bytes   # 28 bytes – encrypted data
-    counter: int     # 1 byte  – sequence counter
-    tag: bytes       # 3 bytes – session / device tag
-    trailer: int     # 1 byte  – 0xAE (reject) or 0xAF (new-protocol)
+    payload: bytes  # 28 bytes – encrypted data
+    counter: int  # 1 byte  – sequence counter
+    tag: bytes  # 3 bytes – session / device tag
+    trailer: int  # 1 byte  – 0xAE (reject) or 0xAF (new-protocol)
 
     @property
     def is_reject(self) -> bool:

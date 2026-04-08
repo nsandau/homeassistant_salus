@@ -18,6 +18,7 @@ def _mock_response(status: int = 200, body: bytes = b"") -> MagicMock:
     resp.headers = {"Content-Type": "application/octet-stream"}
     return resp
 
+
 # ---------------------------------------------------------------------------
 #  AES-256-CBC (default)
 # ---------------------------------------------------------------------------
@@ -158,7 +159,7 @@ class TestWrapUnwrap:
         body = '{"status":"success"}'
         raw = proto.encrypt(body)
         # Append a 1-byte trailer (simulates the 0xAE gateway trailer)
-        raw_with_trailer = raw + b"\xAE"
+        raw_with_trailer = raw + b"\xae"
         assert proto.unwrap_response(raw_with_trailer) == body
 
     def test_unwrap_strips_multi_byte_trailer(self):
@@ -251,7 +252,7 @@ class TestAesCbcConnect:
     async def test_connect_reject_frame_raises(self):
         """33-byte 0xAE response should raise with reject-frame message."""
         proto = AesCbcProtocol(self.EUID)
-        reject = bytes(32) + b"\xAE"
+        reject = bytes(32) + b"\xae"
 
         mock_resp = _mock_response(200, reject)
 
@@ -264,7 +265,7 @@ class TestAesCbcConnect:
     async def test_connect_new_protocol_frame_raises(self):
         """33-byte 0xAF response should raise with new-protocol-frame message."""
         proto = AesCbcProtocol(self.EUID)
-        new_proto_resp = bytes(32) + b"\xAF"
+        new_proto_resp = bytes(32) + b"\xaf"
 
         mock_resp = _mock_response(200, new_proto_resp)
 
@@ -278,9 +279,7 @@ class TestAesCbcConnect:
         """Real-world 33-byte reject from debug logs."""
         proto = AesCbcProtocol(self.EUID)
         reject = bytes.fromhex(
-            "8b4108b7dcf1ed6bc03180fa566eb857"
-            "40db686c8dc55a95b8bd72be640888fd"
-            "ae"
+            "8b4108b7dcf1ed6bc03180fa566eb85740db686c8dc55a95b8bd72be640888fdae"
         )
 
         mock_resp = _mock_response(200, reject)
@@ -290,4 +289,3 @@ class TestAesCbcConnect:
 
         with pytest.raises(ValueError, match="reject frame"):
             await proto.connect(mock_session, "192.168.1.1", 80, 5)
-

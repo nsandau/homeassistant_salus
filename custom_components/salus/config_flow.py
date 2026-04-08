@@ -44,9 +44,9 @@ class SalusOptionsFlowHandler(config_entries.OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Optional(
-                        CONF_POLL_FAILURE_THRESHOLD, default=current
-                    ): vol.All(int, vol.Range(min=0, max=50)),
+                    vol.Optional(CONF_POLL_FAILURE_THRESHOLD, default=current): vol.All(
+                        int, vol.Range(min=0, max=50)
+                    ),
                 }
             ),
         )
@@ -105,4 +105,3 @@ class SalusFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema(GATEWAY_SETTINGS),
             errors=errors,
         )
-

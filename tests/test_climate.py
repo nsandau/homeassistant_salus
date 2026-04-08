@@ -139,9 +139,7 @@ class TestSalusThermostatProperties:
             fan_modes=[FAN_MODE_AUTO, FAN_MODE_HIGH],
             locked=False,
             supported_features=(
-                SUPPORT_TARGET_TEMPERATURE
-                | SUPPORT_PRESET_MODE
-                | SUPPORT_FAN_MODE
+                SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE | SUPPORT_FAN_MODE
             ),
             device_class="temperature",
             data={"UniID": "fc_001", "Endpoint": 1},
@@ -166,9 +164,7 @@ class TestSalusThermostatCommands:
     async def test_set_temperature(self, climate_device):
         entity, gw = _make_entity(climate_device)
         await entity.async_set_temperature(temperature=23.5)
-        gw.set_climate_device_temperature.assert_awaited_once_with(
-            "climate_001", 23.5
-        )
+        gw.set_climate_device_temperature.assert_awaited_once_with("climate_001", 23.5)
 
     async def test_set_temperature_no_value(self, climate_device):
         entity, gw = _make_entity(climate_device)
@@ -178,9 +174,7 @@ class TestSalusThermostatCommands:
     async def test_set_hvac_mode(self, climate_device):
         entity, gw = _make_entity(climate_device)
         await entity.async_set_hvac_mode(HVACMode.OFF)
-        gw.set_climate_device_mode.assert_awaited_once_with(
-            "climate_001", HVACMode.OFF
-        )
+        gw.set_climate_device_mode.assert_awaited_once_with("climate_001", HVACMode.OFF)
 
     async def test_set_preset_mode(self, climate_device):
         entity, gw = _make_entity(climate_device)

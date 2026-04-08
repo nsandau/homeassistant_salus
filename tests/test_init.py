@@ -97,9 +97,7 @@ async def test_setup_entry_auth_error(hass: HomeAssistant) -> None:
 
     with patch(GATEWAY_PATCH) as mock_gw_cls:
         mock_gw = AsyncMock()
-        mock_gw.connect = AsyncMock(
-            side_effect=IT600AuthenticationError("bad")
-        )
+        mock_gw.connect = AsyncMock(side_effect=IT600AuthenticationError("bad"))
         mock_gw.close = AsyncMock()
         mock_gw_cls.return_value = mock_gw
 

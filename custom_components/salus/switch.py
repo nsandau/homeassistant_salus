@@ -36,9 +36,7 @@ async def async_setup_entry(
             )
 
     _async_add_new()
-    config_entry.async_on_unload(
-        coordinator.async_add_listener(_async_add_new)
-    )
+    config_entry.async_on_unload(coordinator.async_add_listener(_async_add_new))
 
 
 class SalusSwitch(SalusEntity, SwitchEntity):
@@ -63,4 +61,3 @@ class SalusSwitch(SalusEntity, SwitchEntity):
     async def async_turn_off(self, **kwargs) -> None:
         await self._gateway.turn_off_switch_device(self._idx)
         await self.coordinator.async_request_refresh()
-

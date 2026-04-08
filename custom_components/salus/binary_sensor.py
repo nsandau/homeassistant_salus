@@ -33,14 +33,11 @@ async def async_setup_entry(
         if new_ids:
             tracked.update(new_ids)
             async_add_entities(
-                SalusBinarySensor(coordinator, idx, gateway)
-                for idx in new_ids
+                SalusBinarySensor(coordinator, idx, gateway) for idx in new_ids
             )
 
     _async_add_new()
-    config_entry.async_on_unload(
-        coordinator.async_add_listener(_async_add_new)
-    )
+    config_entry.async_on_unload(coordinator.async_add_listener(_async_add_new))
 
 
 class SalusBinarySensor(SalusEntity, BinarySensorEntity):
@@ -68,4 +65,3 @@ class SalusBinarySensor(SalusEntity, BinarySensorEntity):
     @property
     def extra_state_attributes(self) -> dict | None:
         return self._device.extra_state_attributes
-

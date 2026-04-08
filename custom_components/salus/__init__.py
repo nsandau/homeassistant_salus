@@ -14,7 +14,11 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .config_flow import CONF_FLOW_TYPE, CONF_USER
 from .const import CONF_POLL_FAILURE_THRESHOLD, DEFAULT_POLL_FAILURE_THRESHOLD, DOMAIN
-from .exceptions import IT600AuthenticationError, IT600ConnectionError, IT600UnsupportedFirmwareError
+from .exceptions import (
+    IT600AuthenticationError,
+    IT600ConnectionError,
+    IT600UnsupportedFirmwareError,
+)
 from .gateway import IT600Gateway
 
 _LOGGER = logging.getLogger(__name__)
@@ -68,15 +72,16 @@ async def async_setup_gateway_entry(
             except Exception as exc:
                 _LOGGER.debug(
                     "Connection attempt %d/%d failed: %s",
-                    attempt, max_attempts, exc,
+                    attempt,
+                    max_attempts,
+                    exc,
                 )
                 if attempt == max_attempts:
                     raise
                 await asyncio.sleep(3)
     except IT600ConnectionError:
         _LOGGER.error(
-            "Connection error: check if you have specified "
-            "gateway's HOST correctly."
+            "Connection error: check if you have specified gateway's HOST correctly."
         )
         return False
     except IT600AuthenticationError:
@@ -146,9 +151,7 @@ async def async_setup_gateway_entry(
         device_registry = dr.async_get(hass)
         device_registry.async_get_or_create(
             config_entry_id=entry.entry_id,
-            connections={
-                (dr.CONNECTION_NETWORK_MAC, gateway_info.unique_id)
-            },
+            connections={(dr.CONNECTION_NETWORK_MAC, gateway_info.unique_id)},
             identifiers={(DOMAIN, gateway_info.unique_id)},
             manufacturer=gateway_info.manufacturer,
             name=gateway_info.name,
@@ -156,9 +159,7 @@ async def async_setup_gateway_entry(
             sw_version=gateway_info.sw_version,
         )
 
-    await hass.config_entries.async_forward_entry_setups(
-        entry, GATEWAY_PLATFORMS
-    )
+    await hass.config_entries.async_forward_entry_setups(entry, GATEWAY_PLATFORMS)
 
     return True
 
@@ -175,12 +176,8 @@ async def async_unload_entry(
     if unload_ok:
         data = hass.data[DOMAIN].pop(config_entry.entry_id, None)
         if data is not None:
-            gateway = (
-                data if isinstance(data, IT600Gateway)
-                else data.get("gateway")
-            )
+            gateway = data if isinstance(data, IT600Gateway) else data.get("gateway")
             if gateway is not None:
                 await gateway.close()
 
     return unload_ok
-
