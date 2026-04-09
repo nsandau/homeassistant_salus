@@ -3,7 +3,8 @@
     "step": {
       "init": {
         "data": {
-          "poll_failure_threshold": "Poll failures before unavailable (0 = immediate)"
+          "poll_failure_threshold": "Poll failures before unavailable (0 = immediate)",
+          "roommind_compat_mode": "RoomMind compatibility mode (keep manual hold)"
         }
       }
     }

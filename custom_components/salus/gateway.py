@@ -79,12 +79,14 @@ class IT600Gateway:
         port: int = 80,
         request_timeout: int = 5,
         session: aiohttp.ClientSession | None = None,
+        roommind_compat_mode: bool = False,
     ) -> None:
         self._euid = euid
         self._host = host
         self._port = port
         self._request_timeout = request_timeout
         self._lock = asyncio.Lock()
+        self._roommind_compat_mode = roommind_compat_mode
 
         # Active protocol — set during connect()
         self._protocol: GatewayProtocol | None = None
@@ -1257,9 +1259,24 @@ class IT600Gateway:
             )
             payload = {"sTherS": {"SetSystemMode": sys_mode}}
         else:
-            # iT600: HoldType 7 = off, 0 = follow schedule (auto/heat)
-            hold = 7 if mode == HVAC_MODE_OFF else 0
+            # iT600: HoldType 7 = off, 0 = follow schedule, 2 = permanent hold.
+            # In RoomMind compatibility mode, map HVAC heat -> permanent hold
+            # to prevent bouncing back to follow schedule.
+            if mode == HVAC_MODE_OFF:
+                hold = 7
+            elif mode == HVAC_MODE_HEAT and self._roommind_compat_mode:
+                hold = 2
+            else:
+                hold = 0
             payload = {"sIT600TH": {"SetHoldType": hold}}
+
+            _LOGGER.debug(
+                "set_climate_device_mode(%s): mode=%s -> HoldType=%s (roommind_compat=%s)",
+                device_id,
+                mode,
+                hold,
+                self._roommind_compat_mode,
+            )
 
         await self._make_encrypted_request(
             "write",
@@ -1331,7 +1348,19 @@ class IT600Gateway:
             else:
                 payload = {"sTherS": {"SetHeatingSetpoint_x100": value}}
         else:
-            payload = {"sIT600TH": {"SetHeatingSetpoint_x100": value}}
+            it600_payload: dict[str, int] = {"SetHeatingSetpoint_x100": value}
+            if self._roommind_compat_mode:
+                # Keep thermostat in permanent hold so external controllers
+                # (e.g. RoomMind) can manage target temperatures reliably.
+                it600_payload["SetHoldType"] = 2
+            payload = {"sIT600TH": it600_payload}
+
+            _LOGGER.debug(
+                "set_climate_device_temperature(%s): target=%s, roommind_compat=%s",
+                device_id,
+                setpoint_celsius,
+                self._roommind_compat_mode,
+            )
 
         await self._make_encrypted_request(
             "write",

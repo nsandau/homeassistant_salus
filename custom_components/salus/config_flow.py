@@ -7,7 +7,13 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_TOKEN
 
-from .const import CONF_POLL_FAILURE_THRESHOLD, DEFAULT_POLL_FAILURE_THRESHOLD, DOMAIN
+from .const import (
+    CONF_POLL_FAILURE_THRESHOLD,
+    CONF_ROOMMIND_COMPAT_MODE,
+    DEFAULT_POLL_FAILURE_THRESHOLD,
+    DEFAULT_ROOMMIND_COMPAT_MODE,
+    DOMAIN,
+)
 from .exceptions import (
     IT600AuthenticationError,
     IT600CommandError,
@@ -31,7 +37,7 @@ class SalusOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle Salus integration options."""
 
     async def async_step_init(
-        self, user_input: dict[str, int] | None = None
+        self, user_input: dict[str, int | bool] | None = None
     ) -> config_entries.ConfigFlowResult:
         """Show the options form."""
         if user_input is not None:
@@ -40,6 +46,9 @@ class SalusOptionsFlowHandler(config_entries.OptionsFlow):
         current = self.config_entry.options.get(
             CONF_POLL_FAILURE_THRESHOLD, DEFAULT_POLL_FAILURE_THRESHOLD
         )
+        roommind_compat = self.config_entry.options.get(
+            CONF_ROOMMIND_COMPAT_MODE, DEFAULT_ROOMMIND_COMPAT_MODE
+        )
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
@@ -47,6 +56,10 @@ class SalusOptionsFlowHandler(config_entries.OptionsFlow):
                     vol.Optional(CONF_POLL_FAILURE_THRESHOLD, default=current): vol.All(
                         int, vol.Range(min=0, max=50)
                     ),
+                    vol.Optional(
+                        CONF_ROOMMIND_COMPAT_MODE,
+                        default=roommind_compat,
+                    ): bool,
                 }
             ),
         )

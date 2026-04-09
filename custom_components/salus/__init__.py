@@ -13,7 +13,13 @@ from homeassistant.helpers.config_validation import config_entry_only_config_sch
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .config_flow import CONF_FLOW_TYPE, CONF_USER
-from .const import CONF_POLL_FAILURE_THRESHOLD, DEFAULT_POLL_FAILURE_THRESHOLD, DOMAIN
+from .const import (
+    CONF_POLL_FAILURE_THRESHOLD,
+    CONF_ROOMMIND_COMPAT_MODE,
+    DEFAULT_POLL_FAILURE_THRESHOLD,
+    DEFAULT_ROOMMIND_COMPAT_MODE,
+    DOMAIN,
+)
 from .exceptions import (
     IT600AuthenticationError,
     IT600ConnectionError,
@@ -59,8 +65,12 @@ async def async_setup_gateway_entry(
     """Set up the Gateway component from a config entry."""
     host = entry.data[CONF_HOST]
     euid = entry.data[CONF_TOKEN]
+    roommind_compat = entry.options.get(
+        CONF_ROOMMIND_COMPAT_MODE,
+        DEFAULT_ROOMMIND_COMPAT_MODE,
+    )
 
-    gateway = IT600Gateway(host=host, euid=euid)
+    gateway = IT600Gateway(host=host, euid=euid, roommind_compat_mode=roommind_compat)
 
     try:
         max_attempts = 3

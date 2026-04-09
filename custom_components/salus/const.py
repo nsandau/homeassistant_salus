@@ -6,6 +6,8 @@ from __future__ import annotations
 DOMAIN = "salus"
 CONF_POLL_FAILURE_THRESHOLD = "poll_failure_threshold"
 DEFAULT_POLL_FAILURE_THRESHOLD = 3
+CONF_ROOMMIND_COMPAT_MODE = "roommind_compat_mode"
+DEFAULT_ROOMMIND_COMPAT_MODE = False
 
 # ── Temperature ─────────────────────────────────────────────────────
 DEGREE = "°"
