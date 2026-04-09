@@ -1,4 +1,4 @@
-# Salus iT600 for Home Assistant
+# Salus iT600 RoomMind for Home Assistant
 
 A custom [Home Assistant](https://www.home-assistant.io/) integration that lets you control and monitor your [Salus iT600](https://salus-controls.com/) smart home devices **locally** through the UGE600 or UG800 gateway — thermostats, smart plugs, roller shutters, sensors, and more, all without cloud dependency.
 
@@ -50,19 +50,19 @@ One lock entity per thermostat that supports child lock. Allows **locking/unlock
 
 1. Open HACS in your Home Assistant instance.
 2. Go to **Integrations** → **⋮** → **Custom repositories**.
-3. Add `https://github.com/leonardpitzu/homeassistant_salus` as an **Integration**.
-4. Search for **Salus iT600** and install it.
+3. Add `https://github.com/nsandau/homeassistant_salus` as an **Integration**.
+4. Search for **Salus iT600 RoomMind** and install it.
 5. Restart Home Assistant.
 
 ### Manual
 
-1. Copy the `custom_components/salus` folder into your Home Assistant `config/custom_components/` directory.
+1. Copy the `custom_components/salus_roommind` folder into your Home Assistant `config/custom_components/` directory.
 2. Restart Home Assistant.
 
 ## Configuration
 
 1. Go to **Settings** → **Devices & Services** → **Add Integration**.
-2. Search for **Salus iT600**.
+2. Search for **Salus iT600 RoomMind**.
 3. Enter your gateway's **IP address** and **EUID** (the first 16 characters printed under the gateway's micro-USB port).
 4. The integration will discover all devices on the gateway and create entities automatically.
 
@@ -106,13 +106,13 @@ Add the following to your `configuration.yaml` and restart Home Assistant:
 logger:
   default: info
   logs:
-    custom_components.salus: debug
+    custom_components.salus_roommind: debug
 ```
 
 ### Option 2 — Home Assistant UI
 
 1. Go to **Settings** → **Devices & Services**.
-2. Find the **Salus iT600** integration and click the **⋮** menu.
+2. Find the **Salus iT600 RoomMind** integration and click the **⋮** menu.
 3. Select **Enable debug logging**.
 4. Reproduce the issue.
 5. Click **Disable debug logging** — the browser will download a log file you can inspect or attach to a bug report.

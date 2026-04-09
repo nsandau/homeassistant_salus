@@ -1,0 +1,14 @@
+{
+  "domain": "salus_roommind",
+  "name": "Salus iT600 RoomMind",
+  "codeowners": [
+    "@leonardpitzu"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/nsandau/homeassistant_salus",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/nsandau/homeassistant_salus/issues",
+  "requirements": ["cryptography>=42.0.0"],
+  "version": "1.0.0"
+}

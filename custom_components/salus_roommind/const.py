@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 # ── Home Assistant integration ──────────────────────────────────────
-DOMAIN = "salus"
+DOMAIN = "salus_roommind"
 CONF_POLL_FAILURE_THRESHOLD = "poll_failure_threshold"
 DEFAULT_POLL_FAILURE_THRESHOLD = 3
 CONF_ROOMMIND_COMPAT_MODE = "roommind_compat_mode"

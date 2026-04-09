@@ -10,7 +10,7 @@
     }
   },
   "config": {
-    "flow_title": "Salus: {name}",
+    "flow_title": "Salus RoomMind: {name}",
     "step": {
       "user": {
         "title": "Connect to Salus Gateway",
